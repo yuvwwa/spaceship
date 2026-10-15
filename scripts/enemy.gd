@@ -7,13 +7,19 @@ var max_force: float = 10
 var max_speed: float = 6
 var max_distance: int = 100
 var min_distance: int = 30 # пикселей
-var angular_speed: float = 0.1
+var angular_speed: float = 1
+var orbiting: bool = false # включен ли режим вращения
+var orbit_angle: float = 0.0 # текущий угол вращения
+var orbit_radius: float = 150.0 # радиус окружности в пикселях
+var orbit_target: Vector2 = Vector2.ZERO # положение корабля, вокруг которого вращается враг
 
 @onready var window = get_parent().get_window()
 @onready var size = get_node("EnemyBoid").texture.get_size() ## что то не так
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	add_to_group("enemies")
+	
 	var x = randi_range(0 + size.x, window.size.x - size.x)
 	var y = randi_range(0 + size.y, window.size.y - size.y)
 	position.x = x
@@ -23,6 +29,9 @@ func _ready() -> void:
 
 # Called every frame. 'delta' is the elapsed time since the previous frame. 
 func _process(delta: float) -> void:
+	if orbiting:
+		return
+
 	velocity += acceleration * delta
 	velocity = velocity.limit_length(max_speed)
 	position += velocity 
@@ -30,7 +39,7 @@ func _process(delta: float) -> void:
 	rotation = velocity.angle()
 	position += velocity * delta
 	rotation += angular_speed * delta
-	
+
 	borders()
 	
 		
@@ -155,3 +164,13 @@ func alignment(group: Node2D):
 		mean_velocity -= velocity
 		var steering = mean_velocity - velocity
 		apply_force(steering.limit_length(max_force))
+
+
+# Функция вращения
+func orbit(target: Vector2, delta: float) -> void:
+	orbiting = true
+	orbit_target = target
+
+	orbit_angle += angular_speed * delta
+
+	position = orbit_target + Vector2(cos(orbit_angle), sin(orbit_angle)) * orbit_radius
