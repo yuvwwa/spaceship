@@ -3,9 +3,17 @@
 [ext_resource type="Script" uid="uid://cfc8evxsqxauq" path="res://scripts/enemy.gd" id="1_md0e3"]
 [ext_resource type="Texture2D" uid="uid://delwc8at7w8mm" path="res://assets/enemy_boid.png" id="2_rqtbn"]
 
-[node name="Enemy" type="Node2D" unique_id=361201601]
+[sub_resource type="CircleShape2D" id="CircleShape2D_enemy"]
+radius = 20.0
+
+[node name="Enemy" type="Node2D"]
 script = ExtResource("1_md0e3")
 
-[node name="EnemyBoid" type="Sprite2D" parent="." unique_id=1295605349]
+[node name="EnemyBoid" type="Sprite2D" parent="."]
 rotation = -1.5707964
 texture = ExtResource("2_rqtbn")
+
+[node name="EnemyArea" type="Area2D" parent="."]
+
+[node name="EnemyCollision" type="CollisionShape2D" parent="EnemyArea"]
+shape = SubResource("CircleShape2D_enemy")
